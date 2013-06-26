@@ -521,4 +521,23 @@ suite('Util: Expression Syntax', function() {
     Platform.performMicrotaskCheckpoint();
     assert.strictEqual('1:blat', div.childNodes[1].textContent);
   });
+
+  test('Expressions member expression', function() {
+    var div = createTestHtml(
+        '<template bind="{{ }}">' +
+            '{{array[0]}} + {{array[1]}} = {{array[array.length - 1]}}' +
+        '</template>');
+
+    var model = {
+      array: [1, 2, 3]
+    };
+
+    recursivelySetTemplateModel(div, model);
+    Platform.performMicrotaskCheckpoint();
+    assert.strictEqual('1 + 2 = 3', div.childNodes[1].textContent);
+
+    model.array = [4, 5, 9];
+    Platform.performMicrotaskCheckpoint();
+    assert.strictEqual('4 + 5 = 9', div.childNodes[1].textContent);
+  });
 });
